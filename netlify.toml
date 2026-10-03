@@ -1,8 +1,0 @@
-[build]
-  command = "prisma generate && next build"
-
-[build.environment]
-  NODE_VERSION = "20"
-  DATABASE_URL = "file:./dev.db"
-  NEXTAUTH_SECRET = "avanya_super_secret_jwt_encryption_key_production_32chars"
-  NODE_ENV = "production"
