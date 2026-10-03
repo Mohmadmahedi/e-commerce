@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+  # ---------------------------------------------------------------------------
+  # AVANYA LUXURY E-COMMERCE APPLICATION
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: avanya_web_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=avanya_production_jwt_secret_key_32_characters_random_enterprise_2026
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NEXT_PUBLIC_STORE_NAME=AVANYA
+      - NEXT_PUBLIC_CURRENCY_SYMBOL=₹
+      # PostgreSQL Production Connection Pool
+      - DATABASE_URL=postgresql://avanya_user:avanya_secure_password_2026@postgres:5432/avanya_db?schema=public
+      # Redis Distributed Cache & Rate Limiting
+      - REDIS_URL=redis://:redis_secure_password_2026@redis:6379
+      # Payment Gateway Configuration
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_test_placeholder}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-placeholder_secret}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET:-placeholder_webhook}
+      # Email Dispatcher
+      - RESEND_API_KEY=${RESEND_API_KEY:-re_placeholder}
+      - EMAIL_FROM=AVANYA Atelier <concierge@avanya.in>
+      - ADMIN_EMAIL=admin@avanya.in
+    volumes:
+      - uploads_data:/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - avanya_network
+
+  # ---------------------------------------------------------------------------
+  # POSTGRESQL 16 ENTERPRISE DATABASE
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: avanya_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: avanya_user
+      POSTGRES_PASSWORD: avanya_secure_password_2026
+      POSTGRES_DB: avanya_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U avanya_user -d avanya_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - avanya_network
+
+  # ---------------------------------------------------------------------------
+  # REDIS 7 DISTRIBUTED IN-MEMORY CACHE & RATE LIMITER
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: avanya_redis
+    restart: unless-stopped
+    command: redis-server --requirepass redis_secure_password_2026 --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_secure_password_2026", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - avanya_network
+
+# -----------------------------------------------------------------------------
+# PERSISTENT STORAGE VOLUMES & ISOLATED NETWORK
+# -----------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  avanya_network:
+    driver: bridge

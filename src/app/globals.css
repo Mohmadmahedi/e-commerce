@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm off-white #FAF8F5 */
+    --background: 40 33% 98%;
+    /* Rich obsidian #111111 */
+    --foreground: 0 0% 7%;
+
+    /* Card background #FFFFFF */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+
+    /* Deep Emerald #0B5D4B */
+    --primary: 167 79% 21%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Warm stone #F5F1EB */
+    --secondary: 36 29% 94%;
+    --secondary-foreground: 0 0% 15%;
+
+    --muted: 36 20% 92%;
+    --muted-foreground: 0 0% 40%;
+
+    /* Terracotta accent #C8553D */
+    --accent: 11 58% 51%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Subtle luxury border #E5E0D8 */
+    --border: 37 17% 87%;
+    --input: 37 17% 87%;
+    --ring: 167 79% 21%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-surface text-ink antialiased font-sans;
+    background-color: #FAF8F5;
+    color: #111111;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-ink;
+  }
+}
+
+/* Custom luxury scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF8F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8D2C7;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0B5D4B;
+}
+
+/* Smooth luxury transitions */
+.transition-luxury {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Shimmer animation utility */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+}
