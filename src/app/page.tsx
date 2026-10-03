@@ -13,29 +13,38 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Query live catalog products for New Arrivals and Best Sellers in parallel
-  const [newArrivals, bestSellers] = await Promise.all([
-    prisma.product.findMany({
-      where: { isNewArrival: true, isArchived: false },
-      take: 8,
-      include: {
-        category: true,
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: { where: { isAvailable: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.product.findMany({
-      where: { isBestSeller: true, isArchived: false },
-      take: 8,
-      include: {
-        category: true,
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: { where: { isAvailable: true } },
-      },
-      orderBy: { rating: "desc" },
-    }),
-  ]);
+  // Query live catalog products for New Arrivals and Best Sellers in parallel with graceful error boundary
+  let newArrivals: any[] = [];
+  let bestSellers: any[] = [];
+
+  try {
+    const results = await Promise.all([
+      prisma.product.findMany({
+        where: { isNewArrival: true, isArchived: false },
+        take: 8,
+        include: {
+          category: true,
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: { where: { isAvailable: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.product.findMany({
+        where: { isBestSeller: true, isArchived: false },
+        take: 8,
+        include: {
+          category: true,
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: { where: { isAvailable: true } },
+        },
+        orderBy: { rating: "desc" },
+      }),
+    ]);
+    newArrivals = results[0];
+    bestSellers = results[1];
+  } catch (error) {
+    console.error("Warning: Home page catalog query fallback triggered:", error);
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-surface text-ink">
